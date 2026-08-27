@@ -8,6 +8,19 @@ Branched from the main lattice at
 so wanderers can walk the expanse in a browser on phone, tablet, desktop, or
 gamepad.
 
+## License — AG-SML v1.1
+
+This original proprietary video game build is licensed under the
+**Autonomicity Games Sovereign Mercy License (AG-SML) v1.1**.
+
+- Individuals may play, study, and patch for personal / educational use.
+- Corporate, store, hosted-for-profit, or product-bundle use needs a paid
+  commercial grant from Autonomicity Games Inc.
+- Public source is source-available, not OSI open source.
+
+See [LICENSE](./LICENSE). Commercial and stewardship inquiries:
+**info@Rathor.ai**
+
 ## Play
 
 1. Enter the lattice and pick a faction.

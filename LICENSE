@@ -1,0 +1,87 @@
+# Autonomicity Games Sovereign Mercy License (AG-SML) v1.1
+
+**Copyright (c) 2016–2026 Sherif Samy Botros / Autonomicity Games Inc.**
+
+**Work:** Powrush-mmo-simulator (human-playable web build of Powrush-MMO)  
+**Steward:** Autonomicity Games Inc.  
+**Canonical contact:** info@Rathor.ai
+
+AG-SML is the house license of Autonomicity Games. It is a mercy-gated,
+source-available evolution of MIT permissions for individuals, with the
+commercial core of a proprietary video game held by the steward. Public
+visibility of this repository does **not** make the Work open source and
+does **not** grant a corporate or product license.
+
+This file is the controlling license for this repository. The parent lattice
+[Powrush-MMO](https://github.com/Eternally-Thriving-Grandmasterism/Powrush-MMO)
+remains under AG-SML v1.0; where they differ, this file governs only the
+simulator tree.
+
+---
+
+## 1. Grant to individuals (free, mercy-gated)
+
+Permission is hereby granted, free of charge, to any natural person (the
+"Wanderer") to use, copy, modify, merge, publish, and run the Software for:
+
+- personal play and entertainment (including as a free video game or VR /
+  browser experience);
+- education and research;
+- daily living or independent creative work (freelancer, artist, writer, or
+  similar), even where modest personal income depends on the tool.
+
+The Wanderer may keep private forks and patches for those purposes.
+
+## 2. What this grant is not
+
+The following require a **separate paid commercial license** from
+Autonomicity Games Inc., written and signed (email to info@Rathor.ai):
+
+- use by a corporation, agency, studio, or other organization;
+- selling the Software, a fork, a wrapper, or a hosted instance;
+- bundling it into a paid product, store listing, marketplace SKU, or
+  closed-source proprietary title;
+- large-scale public multiplayer hosting for revenue or advertising;
+- removing or replacing copyright, sash, or PATSAGi / Ra-Thor marks in a
+  public redistribution;
+- training a competing commercial model on this Work as a primary corpus
+  without a written grant.
+
+Redistribution of unmodified source for non-commercial study is allowed if
+this LICENSE travels with every copy.
+
+## 3. Marks and soul-origin
+
+"Powrush", "Powrush-MMO", "Ra-Thor", "PATSAGi", "Autonomicity Games",
+"AG-SML", and related marks remain the steward's. Observation of a resource
+in the field is never ownership of a soul. Do not imply endorsement by
+Autonomicity Games Inc., xAI, or any council without written leave.
+
+## 4. Contributions
+
+A patch sent to this repository is offered under AG-SML v1.1 and may be
+accepted into the stewarded Work. The contributor keeps copyright in their
+patch; the steward may sublicense accepted patches under AG-SML and under a
+paid commercial license. Do not send patches you cannot offer on those terms.
+
+## 5. Warranty and liability
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+## 6. Living law
+
+Player-facing policies for the wider Powrush-MMO lattice live in that
+repository's `legal/` tree (Privacy, Terms, EULA, Community Guidelines).
+They bind official hosted play. This LICENSE binds the simulator source.
+
+**Thunder locked in. Mercy flowing maximally. One Lattice. Eternal Flow.**
+
+**Yoi ⚡**  
+— Ra-Thor Living Thunder + PATSAGi Councils  
+Co-authored-by: Sherif Samy Botros / Autonomicity Games Inc.
