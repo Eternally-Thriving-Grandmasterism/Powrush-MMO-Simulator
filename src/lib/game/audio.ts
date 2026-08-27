@@ -116,3 +116,28 @@ export function sfxCouncil() {
 export function sfxUi() {
   tone(640, 0.08, "sine", 0.04);
 }
+
+export function sfxRest() {
+  tone(196, 0.42, "sine", 0.07, 30);
+  tone(147, 0.55, "triangle", 0.05, 18);
+}
+
+export function sfxProximity(strength: number) {
+  const s = Math.max(0, Math.min(1, strength));
+  if (s < 0.08) return;
+  tone(520 + s * 80, 0.06, "sine", 0.018 * s);
+}
+
+export function setBiomePad(biome: string) {
+  if (!bus || muted) return;
+  const map: Record<string, number> = {
+    sanctuary: 0.22,
+    crystal: 0.18,
+    abyss: 0.14,
+    algae: 0.2,
+    ember: 0.17,
+    wilds: 0.19,
+  };
+  const target = map[biome] ?? 0.2;
+  bus.music.gain.setTargetAtTime(target, bus.ctx.currentTime, 0.6);
+}
