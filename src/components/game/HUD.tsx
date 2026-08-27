@@ -1,18 +1,17 @@
 import type { ReactNode } from "react";
-import { BookOpen, Leaf, Pause, Scale, Volume2, VolumeX, X } from "lucide-react";
+import { Pause, Volume2, VolumeX, X } from "lucide-react";
 import { factionById } from "@/lib/game/factions";
-import { BIOME_LABEL, RESOURCE_META } from "@/lib/game/world";
+import { BIOME_CLIMATE, BIOME_LABEL, RESOURCE_META } from "@/lib/game/world";
 import { goTitle, resolveCouncil, setOverlay } from "@/lib/game/sim";
 import { isMuted, setMuted } from "@/lib/game/audio";
-import { setHarvestHeld, setStick } from "@/lib/game/input";
 import { useHud } from "@/lib/game/store";
 import { HARVEST_RANGE, type ResourceType, type TutorialStep } from "@/lib/game/types";
 
 const TUTORIAL: Record<TutorialStep, string> = {
-  move: "Move — WASD or the left stick. Q / E orbits the camera.",
-  harvest: "Harvest — walk to a glowing node and press Space.",
-  inventory: "Inventory — press I to see what the field has given.",
-  epiphany: "Keep harvesting. An epiphany arrives when the field answers.",
+  move: "Move — left stick or WASD. Drag the field or tap Q / E to look.",
+  harvest: "Tend — walk to a glow, then hold Tend (Space or F).",
+  inventory: "Allocate — open the lattice share from the pad or press I.",
+  epiphany: "Keep tending. An epiphany arrives when the field answers.",
   council: "Council — press C to sit with PATSAGi on a living proposal.",
   done: "The expanse is yours. H hides this strip.",
 };
@@ -26,18 +25,26 @@ export function HUD() {
 
   return (
     <>
-      <div className="pointer-events-none absolute inset-0 z-10 p-4 sm:p-5">
+      <div className="pointer-events-none absolute inset-0 z-10 p-3 sm:p-5">
         <div className="flex items-start justify-between gap-3">
-          <div className="pointer-events-auto rounded-2xl border border-border bg-surface/90 px-4 py-3 backdrop-blur-sm">
-            <div className="font-display text-sm font-semibold tracking-tight text-fg">
-              {hud.name}
-              <span className="ml-2 font-sans text-xs font-medium text-muted">{fac.name}</span>
+          <div className="pointer-events-auto rounded-2xl border border-white/10 bg-black/40 px-3 py-2 backdrop-blur-md">
+            <div className="text-[13px] font-medium tracking-tight text-white">
+              {BIOME_LABEL[hud.biome].replace(" Prime", "")}
             </div>
-            <div className="mt-0.5 font-mono text-[11px] tracking-wide text-subtle uppercase">
-              {BIOME_LABEL[hud.biome]}
+            <div className="font-mono text-[10px] tracking-wide text-white/55 uppercase">
+              {fac.name}
             </div>
           </div>
           <div className="pointer-events-auto flex items-center gap-2">
+            <div className="hidden rounded-2xl border border-white/10 bg-black/40 px-3 py-2 font-mono text-[10px] tracking-wide text-white/70 sm:block">
+              V {hud.valence.toFixed(1)} · H {hud.harvestCount} · J {Math.floor(hud.grace)}
+              <span className="mt-0.5 block text-right text-white/45">
+                {hud.nearbyCount} nearby
+              </span>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 font-mono text-[10px] text-white/70 sm:hidden">
+              {hud.nearbyCount} nearby
+            </div>
             <IconBtn
               label={hud.muted ? "Unmute" : "Mute"}
               onClick={() => {
@@ -59,62 +66,39 @@ export function HUD() {
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Stat label="Grace" value={Math.floor(hud.grace).toString()} />
-          <Stat label="Valence" value={`${Math.round(hud.valence * 100)}`} />
-          <Stat label="Abundance" value={hud.abundance.toFixed(0)} />
-          <Stat label="Epiphanies" value={String(hud.epiphanies)} />
-        </div>
-
         {!hud.tutorialHidden ? (
-          <div className="pointer-events-auto mt-3 max-w-md rounded-2xl border border-border bg-surface/90 px-4 py-3 text-sm text-fg backdrop-blur-sm">
-            <div className="text-[11px] font-medium tracking-[0.14em] text-muted uppercase">
+          <div className="pointer-events-auto mt-3 max-w-md rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-sm text-white backdrop-blur-md">
+            <div className="text-[11px] font-medium tracking-[0.14em] text-white/50 uppercase">
               First session
             </div>
-            <p className="mt-1 leading-snug">{TUTORIAL[hud.tutorial]}</p>
-            <p className="mt-1 text-xs text-subtle">Press H to hide</p>
+            <p className="mt-1 leading-snug text-white/90">{TUTORIAL[hud.tutorial]}</p>
+            <p className="mt-1 text-xs text-white/40">Press H to hide</p>
           </div>
         ) : null}
 
         {hud.whisper ? (
-          <div className="pointer-events-none mt-3 max-w-lg rounded-2xl border border-border bg-raised/90 px-4 py-3 backdrop-blur-sm">
-            <div className="font-mono text-[10px] tracking-[0.16em] text-muted uppercase">
+          <div className="pointer-events-none mt-3 max-w-lg rounded-2xl border border-white/10 bg-black/50 px-4 py-3 backdrop-blur-md">
+            <div className="font-mono text-[10px] tracking-[0.16em] text-white/45 uppercase">
               {hud.whisper.council} · {hud.whisper.gate}
             </div>
-            <p className="mt-1 text-sm leading-relaxed text-fg">{hud.whisper.text}</p>
+            <p className="mt-1 text-sm leading-relaxed text-white/90">{hud.whisper.text}</p>
           </div>
         ) : null}
 
         {hud.nearest && hud.nearestDist < HARVEST_RANGE ? (
-          <div className="pointer-events-none absolute bottom-28 left-1/2 w-[min(92vw,22rem)] -translate-x-1/2 rounded-2xl border border-border bg-surface/95 px-4 py-3 text-center backdrop-blur-sm sm:bottom-24">
-            <div className="flex items-center justify-center gap-2 text-sm text-fg">
-              <Leaf className="size-4 text-thrive" />
-              {RESOURCE_META[hud.nearest.type].label}
-              {hud.nearest.restrictedUntil > 0 ? (
-                <span className="text-xs text-warn"> · resting</span>
-              ) : (
-                <span className="text-xs text-muted"> · Space to harvest</span>
-              )}
-            </div>
+          <div className="pointer-events-none absolute top-24 left-1/2 w-[min(92vw,20rem)] -translate-x-1/2 text-center text-[12px] text-white/55">
+            {RESOURCE_META[hud.nearest.type].label}
+            {hud.nearest.restrictedUntil > 0 ? " · resting" : " · in reach"}
           </div>
         ) : null}
       </div>
 
-      <Hotbar inventory={hud.inventory} />
-
-      {hud.overlay === "inventory" ? <InventoryPanel /> : null}
+      {hud.overlay === "inventory" ? <AllocatePanel /> : null}
       {hud.overlay === "council" ? <CouncilPanel /> : null}
       {hud.overlay === "pause" ? <PausePanel /> : null}
+      {hud.overlay === "lineage" ? <LineagePanel /> : null}
+      {hud.overlay === "climate" ? <ClimatePanel /> : null}
     </>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-border bg-surface/90 px-3 py-2 backdrop-blur-sm">
-      <div className="text-[10px] font-medium tracking-[0.14em] text-subtle uppercase">{label}</div>
-      <div className="font-mono text-sm tabular-nums text-fg">{value}</div>
-    </div>
   );
 }
 
@@ -132,34 +116,18 @@ function IconBtn({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="flex size-11 items-center justify-center rounded-xl border border-border bg-surface/90 text-fg backdrop-blur-sm"
+      className="flex size-11 items-center justify-center rounded-xl border border-white/12 bg-black/40 text-white backdrop-blur-md"
     >
       {children}
     </button>
   );
 }
 
-function Hotbar({ inventory }: { inventory: Record<ResourceType, number> }) {
-  return (
-    <div className="pointer-events-none absolute bottom-5 left-1/2 z-10 hidden -translate-x-1/2 gap-1.5 sm:flex">
-      {ORDER.map((k) => (
-        <div
-          key={k}
-          className="flex h-14 w-14 flex-col items-center justify-center rounded-xl border border-border bg-surface/90"
-        >
-          <span className="text-[10px] text-subtle">{RESOURCE_META[k].label}</span>
-          <span className="font-mono text-sm tabular-nums text-fg">{inventory[k].toFixed(0)}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function InventoryPanel() {
+function AllocatePanel() {
   const hud = useHud((s) => s.hud);
   return (
     <Modal
-      title="Inventory"
+      title="Allocate"
       onClose={() => {
         setOverlay("none");
         useHud.getState().push();
@@ -182,6 +150,64 @@ function InventoryPanel() {
       <p className="mt-4 text-xs text-subtle">
         Grace {Math.floor(hud.grace)} · Abundance {hud.abundance.toFixed(1)}
       </p>
+    </Modal>
+  );
+}
+
+function LineagePanel() {
+  const hud = useHud((s) => s.hud);
+  const self = factionById(hud.faction);
+  return (
+    <Modal
+      title="Lineage"
+      onClose={() => {
+        setOverlay("none");
+        useHud.getState().push();
+      }}
+    >
+      <p className="text-sm text-muted">
+        You walk as <span className="text-fg">{hud.name}</span> of the {self.name}. Sash {self.role}.
+      </p>
+      <ul className="mt-4 space-y-2">
+        {hud.nearby.length === 0 ? (
+          <li className="rounded-xl border border-border bg-raised px-4 py-3 text-sm text-muted">
+            No other wanderers in this clearing.
+          </li>
+        ) : (
+          hud.nearby.map((n) => {
+            const f = factionById(n.faction);
+            return (
+              <li
+                key={n.id}
+                className="flex items-center justify-between rounded-xl border border-border bg-raised px-4 py-3"
+              >
+                <span className="text-sm text-fg">{f.name}</span>
+                <span className="font-mono text-xs text-muted">{n.dist.toFixed(1)} u</span>
+              </li>
+            );
+          })
+        )}
+      </ul>
+    </Modal>
+  );
+}
+
+function ClimatePanel() {
+  const hud = useHud((s) => s.hud);
+  const climate = BIOME_CLIMATE[hud.biome];
+  return (
+    <Modal
+      title="Climate"
+      onClose={() => {
+        setOverlay("none");
+        useHud.getState().push();
+      }}
+    >
+      <p className="font-mono text-[11px] tracking-[0.14em] text-muted uppercase">
+        {BIOME_LABEL[hud.biome]}
+      </p>
+      <h3 className="font-display mt-2 text-xl font-semibold tracking-tight">{climate.sky}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-muted">{climate.read}</p>
     </Modal>
   );
 }
@@ -242,10 +268,12 @@ function PausePanel() {
       }}
     >
       <ul className="space-y-1 text-sm text-muted">
-        <li>WASD / stick — move</li>
-        <li>Space / South — harvest</li>
-        <li>I — inventory · C — council · H — hide help</li>
-        <li>Drag to look · Q / E orbit</li>
+        <li>Stick / WASD — walk (A left, D right)</li>
+        <li>Tend / Space / F — harvest a glow</li>
+        <li>Jump / J — leave the ground</li>
+        <li>Sprint / Shift — longer stride</li>
+        <li>Lineage L · Climate K · Allocate I</li>
+        <li>Drag to look · Q / E orbit · gamepad welcome</li>
       </ul>
       <div className="mt-6 flex flex-col gap-2">
         <button
@@ -300,70 +328,4 @@ function Modal({
       </div>
     </div>
   );
-}
-
-export function MobileActions() {
-  const hud = useHud((s) => s.hud);
-  if (hud.phase !== "playing") return null;
-  return (
-    <div className="pointer-events-auto absolute right-4 bottom-8 z-20 flex flex-col gap-2 sm:hidden">
-      <button
-        type="button"
-        aria-label="Harvest"
-        className="flex size-14 items-center justify-center rounded-full border border-border bg-surface/90 text-fg"
-        onPointerDown={() => setHarvestHeld(true)}
-        onPointerUp={() => setHarvestHeld(false)}
-        onPointerCancel={() => setHarvestHeld(false)}
-      >
-        <Leaf className="size-5" />
-      </button>
-      <button
-        type="button"
-        aria-label="Inventory"
-        className="flex size-12 items-center justify-center rounded-full border border-border bg-surface/90 text-fg"
-        onClick={() => {
-          setOverlay(hud.overlay === "inventory" ? "none" : "inventory");
-          useHud.getState().push();
-        }}
-      >
-        <BookOpen className="size-4" />
-      </button>
-      <button
-        type="button"
-        aria-label="Council"
-        className="flex size-12 items-center justify-center rounded-full border border-border bg-surface/90 text-fg"
-        onClick={() => {
-          setOverlay(hud.overlay === "council" ? "none" : "council");
-          useHud.getState().push();
-        }}
-      >
-        <Scale className="size-4" />
-      </button>
-    </div>
-  );
-}
-
-export function TouchStick() {
-  const hud = useHud((s) => s.hud);
-  if (hud.phase !== "playing" || hud.overlay !== "none") return null;
-  return (
-    <div
-      className="absolute bottom-8 left-4 z-20 size-32 touch-none sm:hidden"
-      onPointerDown={(e) => handleStick(e)}
-      onPointerMove={(e) => {
-        if (e.buttons) handleStick(e);
-      }}
-      onPointerUp={() => setStick(0, 0)}
-      onPointerCancel={() => setStick(0, 0)}
-    >
-      <div className="size-full rounded-full border border-border bg-surface/50" />
-    </div>
-  );
-}
-
-function handleStick(e: React.PointerEvent<HTMLDivElement>) {
-  const r = e.currentTarget.getBoundingClientRect();
-  const x = ((e.clientX - r.left) / r.width) * 2 - 1;
-  const y = ((e.clientY - r.top) / r.height) * 2 - 1;
-  setStick(Math.max(-1, Math.min(1, x)), Math.max(-1, Math.min(1, y)));
 }
