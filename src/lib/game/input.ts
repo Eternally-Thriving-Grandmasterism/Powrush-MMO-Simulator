@@ -3,11 +3,19 @@ export type Actions = {
   moveY: number;
   interact: boolean;
   interactPressed: boolean;
+  jump: boolean;
+  jumpPressed: boolean;
   sprint: boolean;
   inventory: boolean;
   inventoryPressed: boolean;
   council: boolean;
   councilPressed: boolean;
+  lineage: boolean;
+  lineagePressed: boolean;
+  climate: boolean;
+  climatePressed: boolean;
+  allocate: boolean;
+  allocatePressed: boolean;
   pause: boolean;
   pausePressed: boolean;
   hideHelp: boolean;
@@ -18,13 +26,28 @@ export type Actions = {
 const keys = new Set<string>();
 const injected = new Set<string>();
 let prevInteract = false;
+let prevJump = false;
 let prevInventory = false;
 let prevCouncil = false;
+let prevLineage = false;
+let prevClimate = false;
+let prevAllocate = false;
 let prevPause = false;
 let prevHelp = false;
 let stickX = 0;
 let stickY = 0;
 let harvestHeld = false;
+let sprintHeld = false;
+let jumpHeld = false;
+let lineageHeld = false;
+let climateHeld = false;
+let allocateHeld = false;
+
+export type StickVisual = { x: number; y: number; active: boolean };
+
+export function getStickVisual(): StickVisual {
+  return { x: stickX, y: stickY, active: Math.hypot(stickX, stickY) > 0.02 };
+}
 
 const GAME_CODES = new Set([
   "KeyW",
@@ -37,10 +60,15 @@ const GAME_CODES = new Set([
   "ArrowRight",
   "Space",
   "KeyE",
+  "KeyF",
   "KeyI",
   "KeyC",
   "KeyH",
   "KeyQ",
+  "KeyJ",
+  "KeyK",
+  "KeyL",
+  "KeyR",
   "ShiftLeft",
   "ShiftRight",
   "Escape",
@@ -85,13 +113,29 @@ export function setStick(x: number, y: number) {
     stickY = 0;
     return;
   }
-  const scale = ((m - 0.18) / 0.82) / m;
+  const capped = m > 1 ? 1 / m : 1;
+  const scale = ((Math.min(m, 1) - 0.18) / 0.82) * capped;
   stickX = x * scale;
   stickY = y * scale;
 }
 
 export function setHarvestHeld(v: boolean) {
   harvestHeld = v;
+}
+export function setSprintHeld(v: boolean) {
+  sprintHeld = v;
+}
+export function setJumpHeld(v: boolean) {
+  jumpHeld = v;
+}
+export function setLineageHeld(v: boolean) {
+  lineageHeld = v;
+}
+export function setClimateHeld(v: boolean) {
+  climateHeld = v;
+}
+export function setAllocateHeld(v: boolean) {
+  allocateHeld = v;
 }
 
 function radialDeadzone(x: number, y: number, dz = 0.15) {
@@ -112,11 +156,12 @@ function pollGamepad(actions: Actions) {
       actions.moveX += stick.x;
       actions.moveY += -stick.y;
     }
-    const south = pad.buttons[0]?.pressed;
-    if (south) actions.interact = true;
+    if (pad.buttons[0]?.pressed) actions.interact = true;
     if (pad.buttons[1]?.pressed) actions.sprint = true;
-    if (pad.buttons[2]?.pressed) actions.inventory = true;
-    if (pad.buttons[3]?.pressed) actions.council = true;
+    if (pad.buttons[2]?.pressed) actions.jump = true;
+    if (pad.buttons[3]?.pressed) actions.lineage = true;
+    if (pad.buttons[4]?.pressed) actions.climate = true;
+    if (pad.buttons[5]?.pressed) actions.allocate = true;
     if (pad.buttons[9]?.pressed) actions.pause = true;
     const look = radialDeadzone(pad.axes[2] ?? 0, pad.axes[3] ?? 0, 0.2);
     actions.camX += look.x;
@@ -139,9 +184,12 @@ export function sampleActions(): Actions {
     moveY /= len;
   }
 
-  const interact = active("Space") || harvestHeld;
-  const inventory = active("KeyI");
+  const interact = active("Space") || active("KeyF") || harvestHeld;
+  const jump = active("KeyJ") || jumpHeld;
+  const inventory = active("KeyI") || active("KeyR") || allocateHeld;
   const council = active("KeyC");
+  const lineage = active("KeyL") || lineageHeld;
+  const climate = active("KeyK") || climateHeld;
   const pause = active("Escape");
   const hideHelp = active("KeyH");
   let camX = 0;
@@ -153,11 +201,19 @@ export function sampleActions(): Actions {
     moveY,
     interact,
     interactPressed: interact && !prevInteract,
-    sprint: active("ShiftLeft") || active("ShiftRight"),
+    jump,
+    jumpPressed: jump && !prevJump,
+    sprint: active("ShiftLeft") || active("ShiftRight") || sprintHeld,
     inventory,
     inventoryPressed: inventory && !prevInventory,
     council,
     councilPressed: council && !prevCouncil,
+    lineage,
+    lineagePressed: lineage && !prevLineage,
+    climate,
+    climatePressed: climate && !prevClimate,
+    allocate: inventory,
+    allocatePressed: inventory && !prevAllocate,
     pause,
     pausePressed: pause && !prevPause,
     hideHelp,
@@ -171,8 +227,12 @@ export function sampleActions(): Actions {
     actions.moveY /= m;
   }
   prevInteract = actions.interact;
+  prevJump = actions.jump;
   prevInventory = actions.inventory;
   prevCouncil = actions.council;
+  prevLineage = actions.lineage;
+  prevClimate = actions.climate;
+  prevAllocate = actions.allocate;
   prevPause = actions.pause;
   prevHelp = actions.hideHelp;
   return actions;
