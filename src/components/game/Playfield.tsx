@@ -5,7 +5,8 @@ import { resumeAudio } from "@/lib/game/audio";
 import { bindInput } from "@/lib/game/input";
 import { installControlsProbe, orbitCamera } from "@/lib/game/sim";
 import { useHud } from "@/lib/game/store";
-import { HUD, MobileActions, TouchStick } from "./HUD";
+import { ControlsPad } from "./ControlsPad";
+import { HUD } from "./HUD";
 import { TitleScreen } from "./TitleScreen";
 import { WorldScene } from "./WorldScene";
 
@@ -31,7 +32,7 @@ export default function Playfield() {
       <div
         className="absolute inset-0 touch-none"
         onPointerDown={(e) => {
-          if ((e.target as HTMLElement).closest("button, input, a")) return;
+          if ((e.target as HTMLElement).closest("button, input, a, [data-control]")) return;
           drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
           e.currentTarget.setPointerCapture(e.pointerId);
         }}
@@ -66,8 +67,7 @@ export default function Playfield() {
       {playing ? (
         <>
           <HUD />
-          <TouchStick />
-          <MobileActions />
+          <ControlsPad />
         </>
       ) : null}
     </main>
