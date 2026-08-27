@@ -1,13 +1,5 @@
 import { useRef, useState, type PointerEvent } from "react";
-import {
-  setAllocateHeld,
-  setClimateHeld,
-  setHarvestHeld,
-  setJumpHeld,
-  setLineageHeld,
-  setSprintHeld,
-  setStick,
-} from "@/lib/game/input";
+import { setHarvestHeld, setJumpHeld, setSprintHeld, setStick } from "@/lib/game/input";
 import { setOverlay } from "@/lib/game/sim";
 import { useHud } from "@/lib/game/store";
 import { cn } from "@/lib/utils";
@@ -33,31 +25,25 @@ export function ControlsPad() {
             label="Lineage"
             active={hud.overlay === "lineage"}
             onPress={() => {
-              setLineageHeld(true);
               setOverlay(hud.overlay === "lineage" ? "none" : "lineage");
               useHud.getState().push();
             }}
-            onRelease={() => setLineageHeld(false)}
           />
           <PadBtn
             label="Climate"
             active={hud.overlay === "climate"}
             onPress={() => {
-              setClimateHeld(true);
               setOverlay(hud.overlay === "climate" ? "none" : "climate");
               useHud.getState().push();
             }}
-            onRelease={() => setClimateHeld(false)}
           />
           <PadBtn
             label="Allocate"
             active={hud.overlay === "inventory"}
             onPress={() => {
-              setAllocateHeld(true);
               setOverlay(hud.overlay === "inventory" ? "none" : "inventory");
               useHud.getState().push();
             }}
-            onRelease={() => setAllocateHeld(false)}
           />
           <PadBtn
             label="Jump"
@@ -95,7 +81,7 @@ function PadBtn({
 }: {
   label: string;
   onPress: () => void;
-  onRelease: () => void;
+  onRelease?: () => void;
   hold?: boolean;
   active?: boolean;
   lit?: boolean;
@@ -113,13 +99,15 @@ function PadBtn({
       )}
       onPointerDown={(e) => {
         e.preventDefault();
+        e.stopPropagation();
         e.currentTarget.setPointerCapture(e.pointerId);
         onPress();
       }}
-      onPointerUp={onRelease}
-      onPointerCancel={onRelease}
-      onClick={() => {
-        if (!hold) return;
+      onPointerUp={() => {
+        if (hold) onRelease?.();
+      }}
+      onPointerCancel={() => {
+        if (hold) onRelease?.();
       }}
     >
       {label}
@@ -166,6 +154,7 @@ function FloatingStick({ locked }: { locked: boolean }) {
       onPointerDown={(e) => {
         if (locked) return;
         e.preventDefault();
+        e.stopPropagation();
         e.currentTarget.setPointerCapture(e.pointerId);
         origin.current = { x: e.clientX, y: e.clientY };
         move(e);
