@@ -52,6 +52,33 @@ export const BIOME_LABEL: Record<BiomeId, string> = {
   wilds: "The Wilds",
 };
 
+export const BIOME_CLIMATE: Record<BiomeId, { sky: string; read: string }> = {
+  sanctuary: {
+    sky: "Still green light",
+    read: "Gentle pressure. Glows rest on stone rings. The field invites a walk, not a rush.",
+  },
+  crystal: {
+    sky: "High mineral wind",
+    read: "Cool resonance. Nodes sing if you linger. Stress rises if you take too much.",
+  },
+  abyss: {
+    sky: "Low tide dark",
+    read: "Dense air. Energy pools here. Harvest slowly — the depth remembers.",
+  },
+  algae: {
+    sky: "Wet photosynthetic haze",
+    read: "Breathing green. Food and energy braid. Good ground for a patient tend.",
+  },
+  ember: {
+    sky: "Warm ridge shimmer",
+    read: "Heat in the lattice. Alloys answer a light hand. Rest the ridge when it cracks.",
+  },
+  wilds: {
+    sky: "Open crossing",
+    read: "Unclaimed stride. Mixed yield. Wanderers pass through on their own errands.",
+  },
+};
+
 export const RESOURCE_META: Record<
   ResourceType,
   { label: string; base: number; color: string }

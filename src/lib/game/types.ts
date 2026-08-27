@@ -4,10 +4,19 @@ export const WORLD_HALF = WORLD_SIZE / 2;
 export const HARVEST_RANGE = 3.6;
 export const WALK_SPEED = 5.2;
 export const SPRINT_SPEED = 8.1;
+export const JUMP_VEL = 7.4;
+export const GRAVITY = 22;
 export const FIXED_DT = 1 / 60;
+export const NEARBY_RANGE = 18;
 
 export type Phase = "title" | "faction" | "playing";
-export type Overlay = "none" | "inventory" | "council" | "pause";
+export type Overlay =
+  | "none"
+  | "inventory"
+  | "council"
+  | "pause"
+  | "lineage"
+  | "climate";
 
 export type FactionId =
   | "sovereign"
@@ -107,6 +116,8 @@ export type PlayerState = {
   pitch: number;
   vx: number;
   vz: number;
+  vy: number;
+  air: number;
   speed: number;
   grounded: boolean;
 };
@@ -133,6 +144,12 @@ export type SaveBlob = {
   seed: number;
 };
 
+export type NearbySoul = {
+  id: number;
+  faction: FactionId;
+  dist: number;
+};
+
 export type HudSnapshot = {
   phase: Phase;
   overlay: Overlay;
@@ -146,6 +163,8 @@ export type HudSnapshot = {
   whisper: Whisper | null;
   nearest: ResourceNode | null;
   nearestDist: number;
+  nearbyCount: number;
+  nearby: NearbySoul[];
   tutorial: TutorialStep;
   tutorialHidden: boolean;
   proposal: CouncilProposal;
@@ -153,4 +172,7 @@ export type HudSnapshot = {
   epiphanies: number;
   playing: boolean;
   muted: boolean;
+  tendReady: boolean;
+  grounded: boolean;
+  sprinting: boolean;
 };
