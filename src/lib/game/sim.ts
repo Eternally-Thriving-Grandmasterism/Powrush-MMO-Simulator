@@ -9,7 +9,10 @@ import { persistSave, loadSave } from "./save";
 import { sfxCouncil, sfxEpiphany, sfxHarvest, sfxRestrict, sfxUi, isMuted } from "./audio";
 import {
   FIXED_DT,
+  GRAVITY,
   HARVEST_RANGE,
+  JUMP_VEL,
+  NEARBY_RANGE,
   SPRINT_SPEED,
   WALK_SPEED,
   WORLD_HALF,
@@ -18,6 +21,7 @@ import {
   type HudSnapshot,
   type Inventory,
   type JuiceEvent,
+  type NearbySoul,
   type Overlay,
   type Phase,
   type PlayerState,
@@ -79,6 +83,7 @@ type Sim = {
   lastHud: number;
   whisperSeq: number;
   harvestCd: number;
+  sprinting: boolean;
 };
 
 function defaultPlayer(): PlayerState {
@@ -90,6 +95,8 @@ function defaultPlayer(): PlayerState {
     pitch: 0,
     vx: 0,
     vz: 0,
+    vy: 0,
+    air: 0,
     speed: 0,
     grounded: true,
   };
@@ -126,6 +133,7 @@ function makeSim(): Sim {
     lastHud: 0,
     whisperSeq: 1,
     harvestCd: 0,
+    sprinting: false,
   };
 }
 
@@ -157,6 +165,16 @@ export function nearestNode(): { node: ResourceNode; dist: number } | null {
     }
   }
   return best ? { node: best, dist: bestD } : null;
+}
+
+export function nearbySouls(): NearbySoul[] {
+  const list: NearbySoul[] = [];
+  for (const w of sim.wanderers) {
+    const dist = Math.hypot(w.x - sim.player.x, w.z - sim.player.z);
+    if (dist <= NEARBY_RANGE) list.push({ id: w.id, faction: w.faction, dist });
+  }
+  list.sort((a, b) => a.dist - b.dist);
+  return list;
 }
 
 function pushWhisper(council: string, gate: string, text: string) {
@@ -317,25 +335,25 @@ function tickWanderers(dt: number) {
   }
 }
 
+function toggleOverlay(next: Overlay) {
+  sim.overlay = sim.overlay === next ? "none" : next;
+  sfxUi();
+}
+
 function tickPlayer(dt: number) {
   const a = sampleActions();
   if (sim.phase !== "playing") return a;
 
-  if (a.pausePressed) {
-    sim.overlay = sim.overlay === "pause" ? "none" : "pause";
-    sfxUi();
-  }
+  if (a.pausePressed) toggleOverlay("pause");
   if (sim.overlay === "pause") return a;
 
-  if (a.inventoryPressed) {
-    sim.overlay = sim.overlay === "inventory" ? "none" : "inventory";
+  if (a.inventoryPressed || a.allocatePressed) {
+    toggleOverlay("inventory");
     if (sim.tutorial === "inventory") sim.tutorial = "epiphany";
-    sfxUi();
   }
-  if (a.councilPressed) {
-    sim.overlay = sim.overlay === "council" ? "none" : "council";
-    sfxUi();
-  }
+  if (a.councilPressed) toggleOverlay("council");
+  if (a.lineagePressed) toggleOverlay("lineage");
+  if (a.climatePressed) toggleOverlay("climate");
   if (a.hideHelpPressed) sim.tutorialHidden = !sim.tutorialHidden;
 
   if (sim.overlay !== "none") return a;
@@ -345,6 +363,7 @@ function tickPlayer(dt: number) {
   const wishX = a.moveX;
   const wishY = a.moveY;
   const moving = Math.hypot(wishX, wishY) > 0.05;
+  sim.sprinting = a.sprint && moving;
   const target = (a.sprint ? SPRINT_SPEED : WALK_SPEED) * fac.bonuses.speed;
   const fx = -Math.sin(sim.camYaw);
   const fz = -Math.cos(sim.camYaw);
@@ -389,7 +408,19 @@ function tickPlayer(dt: number) {
   sim.player.z += sim.player.vz * dt;
   sim.player.x = Math.max(-WORLD_HALF + 2, Math.min(WORLD_HALF - 2, sim.player.x));
   sim.player.z = Math.max(-WORLD_HALF + 2, Math.min(WORLD_HALF - 2, sim.player.z));
-  sim.player.y = heightAt(sim.player.x, sim.player.z) + 1.05;
+
+  if (a.jumpPressed && sim.player.grounded) {
+    sim.player.vy = JUMP_VEL;
+    sim.player.grounded = false;
+  }
+  sim.player.vy -= GRAVITY * dt;
+  sim.player.air += sim.player.vy * dt;
+  if (sim.player.air <= 0) {
+    sim.player.air = 0;
+    sim.player.vy = 0;
+    sim.player.grounded = true;
+  }
+  sim.player.y = heightAt(sim.player.x, sim.player.z) + 1.05 + sim.player.air;
   sim.player.speed = Math.hypot(sim.player.vx, sim.player.vz);
 
   const follow = 1 - Math.exp(-3.2 * dt);
@@ -535,6 +566,8 @@ export function orbitCamera(dx: number, dy: number) {
 
 export function hudSnapshot(): HudSnapshot {
   const near = nearestNode();
+  const souls = nearbySouls();
+  const tendReady = !!near && near.dist < HARVEST_RANGE && near.node.restrictedUntil <= sim.now;
   return {
     phase: sim.phase,
     overlay: sim.overlay,
@@ -548,6 +581,8 @@ export function hudSnapshot(): HudSnapshot {
     whisper: sim.whisper,
     nearest: near && near.dist < 10 ? near.node : null,
     nearestDist: near ? near.dist : 999,
+    nearbyCount: souls.length,
+    nearby: souls.slice(0, 6),
     tutorial: sim.tutorial,
     tutorialHidden: sim.tutorialHidden,
     proposal: sim.proposal,
@@ -555,6 +590,9 @@ export function hudSnapshot(): HudSnapshot {
     epiphanies: sim.epiphanies,
     playing: sim.phase === "playing",
     muted: isMuted(),
+    tendReady,
+    grounded: sim.player.grounded,
+    sprinting: sim.sprinting,
   };
 }
 
@@ -587,6 +625,8 @@ export function installControlsProbe() {
     setPose: (x: number, z: number) => {
       sim.player.x = x;
       sim.player.z = z;
+      sim.player.air = 0;
+      sim.player.vy = 0;
       sim.player.y = heightAt(x, z) + 1.05;
       sim.player.vx = 0;
       sim.player.vz = 0;
