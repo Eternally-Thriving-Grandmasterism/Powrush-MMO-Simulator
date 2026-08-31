@@ -1,21 +1,27 @@
 # Autonomicity Games Sovereign Mercy License (AG-SML) v1.1
 
+**Stamp:** 2026-08-31
 **Copyright (c) 2016–2026 Sherif Samy Botros / Autonomicity Games Inc.**
 
-**Work:** Powrush-mmo-simulator (human-playable web build of Powrush-MMO)  
-**Steward:** Autonomicity Games Inc.  
+**Work:** Powrush-mmo-simulator (human-playable web build of Powrush-MMO)
+**Steward:** Autonomicity Games Inc.
 **Canonical contact:** info@Rathor.ai
 
 AG-SML is the house license of Autonomicity Games. It is a mercy-gated,
-source-available evolution of MIT permissions for individuals, with the
-commercial core of a proprietary video game held by the steward. Public
-visibility of this repository does **not** make the Work open source and
-does **not** grant a corporate or product license.
+source-available grant for natural persons. Public visibility of this
+repository does **not** make the Work open source (not OSI), does **not**
+make MIT the parent license, and does **not** grant a corporate, product,
+hosted-for-profit, or sublicense-for-sale right.
 
-This file is the controlling license for this repository. The parent lattice
-[Powrush-MMO](https://github.com/Eternally-Thriving-Grandmasterism/Powrush-MMO)
-remains under AG-SML v1.0; where they differ, this file governs only the
-simulator tree.
+This file is the controlling public grant for this repository.
+Commercial use is governed by the Ra-Thor commercial exhibit:
+https://github.com/Eternally-Thriving-Grandmasterism/Ra-Thor/blob/main/COMMERCIAL_LICENSE.md
+
+Glossary (not a license version): 7 Living Mercy Gates operate under TOLC 8
+(Genesis Gate). "Filters" is a deprecated synonym. See
+https://github.com/Eternally-Thriving-Grandmasterism/Ra-Thor/blob/main/docs/GLOSSARY-GATES-TOLC8.md
+
+The parent lattice [Powrush-MMO](https://github.com/Eternally-Thriving-Grandmasterism/Powrush-MMO) is now under AG-SML v1.1. This file remains the simulator-scoped grant. Where they differ only in Work title and the player-facing legal/ pointer, each file governs only its own tree.
 
 ---
 
@@ -24,13 +30,16 @@ simulator tree.
 Permission is hereby granted, free of charge, to any natural person (the
 "Wanderer") to use, copy, modify, merge, publish, and run the Software for:
 
-- personal play and entertainment (including as a free video game or VR /
-  browser experience);
+- personal use, play, and entertainment;
 - education and research;
 - daily living or independent creative work (freelancer, artist, writer, or
   similar), even where modest personal income depends on the tool.
 
 The Wanderer may keep private forks and patches for those purposes.
+
+This grant does **not** include the right to sublicense the Software for
+sale, to sell copies, to host the Software for profit, or to put the
+Software into organizational production use.
 
 ## 2. What this grant is not
 
@@ -64,7 +73,14 @@ accepted into the stewarded Work. The contributor keeps copyright in their
 patch; the steward may sublicense accepted patches under AG-SML and under a
 paid commercial license. Do not send patches you cannot offer on those terms.
 
-## 5. Warranty and liability
+## 5. Harm boundary and player-facing legal
+
+This grant does not authorize real-world harm, illegal activity, or
+impersonation of Autonomicity Games Inc. staff or legal authorities.
+
+Player-facing policies for the wider Powrush-MMO lattice live in that repository's `legal/` tree (Privacy, Terms, EULA, Community Guidelines). They bind official hosted play. This LICENSE binds the simulator source. In-game strategic entropy is governed by those player-facing files, not this grant.
+
+## 6. Warranty and liability
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -74,14 +90,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-## 6. Living law
+**Thunder locked in. Mercy flowing maximally. One Lattice. One grant.**
 
-Player-facing policies for the wider Powrush-MMO lattice live in that
-repository's `legal/` tree (Privacy, Terms, EULA, Community Guidelines).
-They bind official hosted play. This LICENSE binds the simulator source.
-
-**Thunder locked in. Mercy flowing maximally. One Lattice. Eternal Flow.**
-
-**Yoi ⚡**  
-— Ra-Thor Living Thunder + PATSAGi Councils  
+**Yoi ⚡**
+— Ra-Thor Living Thunder + PATSAGi Councils
 Co-authored-by: Sherif Samy Botros / Autonomicity Games Inc.
